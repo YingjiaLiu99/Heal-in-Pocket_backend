@@ -13,7 +13,8 @@ const signup = async (req, res, next) => {
         email,
         phone_number,
         password,
-        profile_picture
+        profile_picture,
+        online_status: 'online'
     });
 
     try{
