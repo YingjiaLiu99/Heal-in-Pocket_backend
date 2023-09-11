@@ -1,6 +1,6 @@
 const express = require('express');
 
-const recordControllers = require('../controllers/record_controller');
+const recordControllers = require('../controllers/record_controllers/record_controller');
 
 const router = express.Router();
 

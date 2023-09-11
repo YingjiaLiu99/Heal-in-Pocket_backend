@@ -18,3 +18,17 @@ const patientSchema = new Schema({
 patientSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('Patient', patientSchema);
+
+// -----------------Sample JSON data: ------------------------//
+// {
+//     "name":"David Liu",
+//     "email":"test@gmail.com",
+//     "phone_number":8583614927,
+//     "date_of_birth":"11/06/1999",
+//     "gender":"male",
+//     "password":"1234567890",
+//     "insurance":"N.A.",
+//     "profile_picture":"N.A.",
+//     "records":[]
+// }
+// ----------------------------------------------------------//

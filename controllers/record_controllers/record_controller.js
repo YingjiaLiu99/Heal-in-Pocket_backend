@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const HttpError = require('../models/http_error');
-const Record = require('../models/record');
-const Patient = require('../models/patient');
+const HttpError = require('../../models/http_error');
+const Record = require('../../models/record');
+const Patient = require('../../models/patient');
 
 const createRecord = async (req, res, next) => {
-    const { smoking_status, pregnancy_status, chronic_condition, current_medications, allergies, vitals, owner } = req.body;
+    const { smoking_status, pregnancy_status, chronic_condition, current_medications, allergies, chief_complaint, vitals, soap, provider_name, scribe_name, owner } = req.body;
 
     const createdRecord = new Record({
         smoking_status,
@@ -13,7 +13,11 @@ const createRecord = async (req, res, next) => {
         chronic_condition,
         current_medications,
         allergies,
-        vitals,        
+        chief_complaint,
+        vitals,
+        soap,
+        provider_name,
+        scribe_name,
         owner
     });
 

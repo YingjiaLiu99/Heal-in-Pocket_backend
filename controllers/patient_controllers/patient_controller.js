@@ -1,24 +1,28 @@
 // const {validationResult} = require('express-validator');
-const HttpError = require('../models/http_error');
-const Doctor = require('../models/doctor');
+const HttpError = require('../../models/http_error');
+const Patient = require('../../models/patient');
+
 
 const signup = async (req, res, next) => {
     /* potentially can check whether the input of the signup proccess 
      *  is valid using validationResult from express-validator */
 
-    const {name, email, phone_number, password, profile_picture} = req.body;
+    const { name, email, phone_number, date_of_birth, gender, password, insurance, profile_picture } = req.body;
 
-    const createdDoctor = new Doctor({
+    const createdPatient = new Patient({
         name,
         email,
         phone_number,
+        date_of_birth,
+        gender,
         password,
+        insurance,
         profile_picture,
-        online_status: 'online'
+        records: []
     });
 
     try{
-        await createdDoctor.save();
+        await createdPatient.save();
     } catch (err) {
         // check if the email already exists in the database
         if(err.errors && err.errors.email && err.errors.email.kind === 'unique'){
@@ -36,19 +40,20 @@ const signup = async (req, res, next) => {
         ));
     }
 
-    const DoctorObject = createdDoctor.toObject( {getters: true} );
-    // remove the sensitive info of Doctor in the response
-    delete DoctorObject.password;
-    res.status(201).json( {doctor: DoctorObject} );
+    const PatientObject = createdPatient.toObject( {getters: true} );
+    // remove the sensitive info of Patient in the response
+    delete PatientObject.password;
+    res.status(201).json( {patient: PatientObject} );
 };
+
 
 // login using email for now, can be improved later
 const login = async (req, res, next) => {
     const { email, password } = req.body;
 
-    let existingDoctor;
+    let existingPatient;
     try{
-        existingDoctor = await Doctor.findOne( {email: email} );
+        existingPatient = await Patient.findOne( {email: email} );
     } catch (err) {
         console.log(err);
         const error = new HttpError(
@@ -57,14 +62,14 @@ const login = async (req, res, next) => {
         return next(error);
     }
 
-    if (!existingDoctor){
+    if (!existingPatient) {
         const error = new HttpError(
-            'The doctor user you tried to log in does not exist, please try a different email address', 401
+            'The patient user you tried to log in does not exist, please try a different email address', 401
         );
-        return next(error); 
+        return next(error);
     }
 
-    if (existingDoctor.password !== password){
+    if (existingPatient.password !== password){
         const error = new HttpError(
             'The password you entered does not match the email address, please try again', 401
         );
@@ -76,23 +81,31 @@ const login = async (req, res, next) => {
 
 };
 
-const getDoctors = async (req, res, next) => {
-    let doctors;
+const getPatientByPatientId = async (req, res, next) => {
+    const patientId = req.params.patient_id;
+    let patient;
     try{
-        doctors = await Doctor.find({}, '-password');
+        patient = await Patient.findById(patientId);
     } catch (err) {
         console.log(err);
-        const error = new HttpError(
-            'fetching Doctors faild', 500
-        );
-        return next(error);
+        return next(new HttpError(
+            'Failed to sign up due to something wrong with server, please try again later', 500
+        ));        
     }
-    res.json( { doctors: doctors.map(
-        doctor => doctor.toObject( {getters: true} )
-    ) } );
+
+    if (!patient) {
+        return next(new HttpError(
+            'Could not find the patient corresponding to the provided patient id', 404
+        ));        
+    }
+
+    const PatientObject = patient.toObject( {getters: true} );
+    // remove the sensitive info of Patient in the response
+    delete PatientObject.password;
+    res.status(201).json( {patient: PatientObject} );    
 };
 
 
 exports.signup = signup;
 exports.login = login;
-exports.getDoctors = getDoctors;
+exports.getPatientByPatientId = getPatientByPatientId;
