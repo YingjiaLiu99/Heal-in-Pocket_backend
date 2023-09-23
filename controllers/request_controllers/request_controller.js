@@ -12,7 +12,7 @@ const getAllRequests = async (req, res, next) => {
     } catch (err) {
         console.log(err);
         const error = new HttpError(
-            'fetching Request faild', 500
+            'Server Error: The server try to fetch Requests but faild', 500
         );
         return next(error);
     }
