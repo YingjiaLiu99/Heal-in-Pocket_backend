@@ -19,7 +19,7 @@ const addByVolunteer = async (req, res, next) => {
     } catch (err) {
         console.log(err);
         const error = new HttpError(
-            'Saving request failed', 500
+            'new request failed due to mongoDB save() function failed', 500
         );
         return next(error);
     }
