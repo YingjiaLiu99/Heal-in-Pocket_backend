@@ -44,6 +44,7 @@ app.use((error, req, res, next) => {
     res.json({message: error.message || 'An unknown error occured!'});
 });
 
+
 mongoose.connect(process.env.DB_URL)
 .then(() => {
     app.listen(5001);
