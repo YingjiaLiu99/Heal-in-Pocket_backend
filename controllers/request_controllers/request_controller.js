@@ -11,8 +11,7 @@ const addByVolunteer = async (req, res, next) => {
         corresponding_record,
         new_patient,
         chief_complaint
-    });
-    // console.log(newRequest)
+    });    
 
     try {
         await newRequest.save();
