@@ -51,10 +51,7 @@ const updateRequest = async (req, res, next) => {
 
     let request
     try{
-        request = await Request.findById(requestId);
-        if (!request) {
-            throw new Error('Request not found');
-        }
+        request = await Request.findById(requestId);        
     } catch (err) {
         console.log(err);
         const error = new HttpError(
@@ -63,8 +60,14 @@ const updateRequest = async (req, res, next) => {
         return next(error);
     }
 
-    for (let key in updatedData) {
-        request[key] = updatedData[key];
+    if (!request) {
+        return next(new HttpError(
+            'Could not find the request that you tried to update', 404
+        ));
+    }
+
+    for (let field in updatedData) {
+        request[field] = updatedData[field];
     }
 
     try {
@@ -78,8 +81,6 @@ const updateRequest = async (req, res, next) => {
     }
 
     res.status(200).json({request: request.toObject({ getters: true })});
-
-
 };
 
 exports.addByPatient = addByPatient;
