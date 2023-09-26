@@ -3,7 +3,28 @@ const Request = require('../../models/request');
 
 const addByPatient = async (req, res, next) => {};
 
-const addByVolunteer = async (req, res, next) => {};
+const addByVolunteer = async (req, res, next) => {
+    const { patient_name, corresponding_record, new_patient, chief_complaint } = req.body;
+
+    const newRequest = new Request({
+        patient_name,
+        corresponding_record,
+        new_patient,
+        chief_complaint
+    });    
+
+    try {
+        await newRequest.save();
+    } catch (err) {
+        console.log(err);
+        const error = new HttpError(
+            'new request failed due to mongoDB save() function failed', 500
+        );
+        return next(error);
+    }
+
+    res.status(201).json({ request: newRequest.toObject({ getters: true }) });
+};
 
 const getAllRequests = async (req, res, next) => {
     let requests;
