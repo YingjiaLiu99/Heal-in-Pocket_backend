@@ -44,7 +44,46 @@ const getAllRequests = async (req, res, next) => {
 
 const deleteOne = async (req, res, next) => {};
 
+const updateRequest = async (req, res, next) => {
+    const requestId = req.params.request_id;
+    const updatedData = req.body;
+    console.log(updatedData);
+
+    let request
+    try{
+        request = await Request.findById(requestId);
+        if (!request) {
+            throw new Error('Request not found');
+        }
+    } catch (err) {
+        console.log(err);
+        const error = new HttpError(
+            'Server Error: The server try to fetch Requests but faild', 500
+        );
+        return next(error);
+    }
+
+    for (let key in updatedData) {
+        request[key] = updatedData[key];
+    }
+
+    try {
+        await request.save();
+    } catch (err) {
+        console.log(err);
+        const error = new HttpError(
+            'Server Error: Failed to update the request', 500
+        );
+        return next(error);
+    }
+
+    res.status(200).json({request: request.toObject({ getters: true })});
+
+
+};
+
 exports.addByPatient = addByPatient;
 exports.addByVolunteer = addByVolunteer;
 exports.getAllRequests = getAllRequests;
 exports.deleteOne = deleteOne;
+exports.updateRequest = updateRequest;

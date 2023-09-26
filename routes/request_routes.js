@@ -16,5 +16,8 @@ router.get('/', requestControllers.getAllRequests);
 // delete a request
 router.delete('/:record_id', requestControllers.deleteOne);
 
+// update a request
+router.put('/:request_id', requestControllers.updateRequest);
+
 
 module.exports = router;
