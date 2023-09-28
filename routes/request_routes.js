@@ -14,7 +14,7 @@ router.post('/volunteer/add', requestControllers.addByVolunteer);
 router.get('/', requestControllers.getAllRequests);
 
 // delete a request
-router.delete('/:record_id', requestControllers.deleteOne);
+router.delete('/:request_id', requestControllers.deleteOne);
 
 
 module.exports = router;
