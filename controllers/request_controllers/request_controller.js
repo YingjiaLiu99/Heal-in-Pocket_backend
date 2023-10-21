@@ -38,9 +38,31 @@ const getAllRequests = async (req, res, next) => {
         return next(error);
     }
     res.json( {requests: requests.map(
-        request => request.toObject( {getters:true} )
+        request => request.toObject( { getters:true } )
     )} );
 };
+
+const getRequestById = async (req, res, next) => {
+    const requestId = req.params.request_id;
+    let request;
+    try {
+        request = await Request.findById(requestId);
+    } catch (err) {
+        console.log(err);
+        return next(new HttpError(
+            'Failed to find the request by its id due to something wrong with server, please try again later', 500
+        ));
+    }
+
+    if (!request) {
+        return next(new HttpError(
+            'Could not find the request corresponding to the provided request id', 404
+        ));
+    }
+
+    const RequestObject = request.toObject( {getters: true} );
+    res.status(201).json( {request: RequestObject} );
+}
 
 const deleteOne = async (req, res, next) => {};
 
@@ -86,5 +108,6 @@ const updateRequest = async (req, res, next) => {
 exports.addByPatient = addByPatient;
 exports.addByVolunteer = addByVolunteer;
 exports.getAllRequests = getAllRequests;
+exports.getRequestById = getRequestById;
 exports.deleteOne = deleteOne;
 exports.updateRequest = updateRequest;

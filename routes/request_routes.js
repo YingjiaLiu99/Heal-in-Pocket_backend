@@ -13,8 +13,11 @@ router.post('/volunteer/add', requestControllers.addByVolunteer);
 // get all the request
 router.get('/', requestControllers.getAllRequests);
 
+// get request by its id
+router.get('/:request_id', requestControllers.getRequestById);
+
 // delete a request
-router.delete('/:record_id', requestControllers.deleteOne);
+router.delete('/:request_id', requestControllers.deleteOne);
 
 // update a request
 router.put('/:request_id', requestControllers.updateRequest);
