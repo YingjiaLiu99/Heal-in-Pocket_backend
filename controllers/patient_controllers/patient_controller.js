@@ -84,12 +84,12 @@ const login = async (req, res, next) => {
 const getPatientByPatientId = async (req, res, next) => {
     const patientId = req.params.patient_id;
     let patient;
-    try{
+    try {
         patient = await Patient.findById(patientId);
     } catch (err) {
         console.log(err);
         return next(new HttpError(
-            'Failed to sign up due to something wrong with server, please try again later', 500
+            'Failed to get the patient using its id due to something wrong with server, please try again later', 500
         ));        
     }
 
