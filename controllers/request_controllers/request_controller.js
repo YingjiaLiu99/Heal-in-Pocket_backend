@@ -64,7 +64,32 @@ const getRequestById = async (req, res, next) => {
     res.status(201).json( {request: RequestObject} );
 }
 
-const deleteOne = async (req, res, next) => {};
+const deleteOne = async (req, res, next) => {
+    // Get the request id from route
+    const requestId = req.params.request_id;
+    let requestDocument;
+
+    // Delete the request
+    try {
+        // await requests.delete();
+        // Call mongoose API, findByIdAndDelete has return 
+        requestDocument = await Request.findByIdAndDelete(requestId);
+    } catch (err) {
+        console.log(err);
+        return next(new HttpError(
+            'Failed to delete the request due to something wrong with the server, please try again later', 500
+        )); 
+    }
+
+    // Check if the request was actually found
+    if (!requestDocument) {
+        return next(new HttpError(
+            'Could not find the request corresponding to the provided request id', 404
+        ));
+    }
+
+    res.json( {message: "Request delete success"});
+};
 
 const updateRequest = async (req, res, next) => {
     const requestId = req.params.request_id;
