@@ -14,6 +14,8 @@ router.get('/:record_id', recordControllers.getRecordByRecordId);
 // get all the records by the patient's id
 router.get('/patient/:patient_id', recordControllers.getRecordsByPatientId);
 
+// update the record
+router.put('/:record_id', recordControllers.updateRecord);
 
 module.exports = router;
 

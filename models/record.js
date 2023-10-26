@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const recordSchema = new Schema({
+    // define whether this is a vital-check-only record
+    // or its a standard record
+    record_type: {type: String, required: true},
+
     smoking_status: {type : String, required: true},
     pregnancy_status: {type : String, required: true},
     chronic_condition: {type : String, required: true},

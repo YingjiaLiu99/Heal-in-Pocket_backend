@@ -17,7 +17,7 @@ router.get('/', requestControllers.getAllRequests);
 router.get('/:request_id', requestControllers.getRequestById);
 
 // delete a request
-router.delete('/:request_id', requestControllers.deleteOne);
+router.delete('/:request_id', requestControllers.deleteRequestById);
 
 // update a request
 router.put('/:request_id', requestControllers.updateRequest);

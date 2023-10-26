@@ -5,9 +5,10 @@ const Record = require('../../models/record');
 const Patient = require('../../models/patient');
 
 const createRecord = async (req, res, next) => {
-    const { smoking_status, pregnancy_status, chronic_condition, current_medications, allergies, chief_complaint, vitals, soap, provider_name, scribe_name, owner } = req.body;
+    const { record_type, smoking_status, pregnancy_status, chronic_condition, current_medications, allergies, chief_complaint, vitals, soap, provider_name, scribe_name, owner } = req.body;
 
     const createdRecord = new Record({
+        record_type,
         smoking_status,
         pregnancy_status,
         chronic_condition,
@@ -104,7 +105,12 @@ const getRecordsByPatientId = async (req, res, next) => {
     res.json({ records: records.map(record => record.toObject({getters: true})) });
 };
 
+const updateRecord = async (req, res, next) => {
+
+}
+
 
 exports.createRecord = createRecord;
 exports.getRecordByRecordId = getRecordByRecordId;
-exports.getRecordsByPatientId = getRecordsByPatientId
+exports.getRecordsByPatientId = getRecordsByPatientId;
+exports.updateRecord = updateRecord;
