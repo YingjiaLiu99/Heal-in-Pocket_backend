@@ -106,8 +106,43 @@ const getRecordsByPatientId = async (req, res, next) => {
 };
 
 const updateRecord = async (req, res, next) => {
+    const record_id = req.params.record_id;
+    const updatedData = req.body;
+    console.log(updatedData);
 
-}
+    let record;
+    try {
+        record = await Record.findById(record_id);
+    } catch (err) {
+        console.log(err);
+        const error = new HttpError(
+            'Server Error: The server try to fetch Record but faild', 500
+        );
+        return next(error);
+    }
+
+    if (!record) {
+        return next(new HttpError(
+            'Could not find the record that you tried to update', 404
+        ));
+    }
+
+    for (let field in updatedData) {
+        record[field] = updatedData[field];
+    }
+
+    try {
+        await record.save();
+    } catch (err) {
+        console.log(err);
+        const error = new HttpError(
+            'Server Error: Failed to update the record', 500
+        );
+        return next(error);
+    }
+
+    res.status(200).json({record: record.toObject({ getters: true })});
+};
 
 
 exports.createRecord = createRecord;

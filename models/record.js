@@ -39,7 +39,9 @@ module.exports = mongoose.model('Record', recordSchema);
 
 //--------------JSON Sample:----------------------------------//
 // {
-//     "place": {
+//     "record": 
+//      {
+//         "record_type": "standard",
 //         "smoking_status": "Yes",
 //         "pregnancy_status": "No",
 //         "chronic_condition": "diabetes",

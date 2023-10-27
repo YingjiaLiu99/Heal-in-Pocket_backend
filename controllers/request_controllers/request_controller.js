@@ -104,7 +104,7 @@ const updateRequest = async (req, res, next) => {
     const updatedData = req.body;
     console.log(updatedData);
 
-    let request
+    let request;
     try{
         request = await Request.findById(requestId);        
     } catch (err) {
