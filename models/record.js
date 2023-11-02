@@ -16,7 +16,8 @@ const recordSchema = new Schema({
 
     vitals: {        
         temperature: {type : Number, required: true},
-        blood_pressure: {type : Number, required: true},
+        systolic_blood_pressure: {type : Number, required: true},
+        diastolic_blood_pressure: {type : Number, required: true},
         pulse: {type : Number, required: true},
         oxygen: {type : Number, required: true},
         glucose: {type : Number, required: true},        
