@@ -7,30 +7,30 @@ const recordSchema = new Schema({
     // or its a standard record
     record_type: {type: String, required: true},
 
-    smoking_status: {type : String, required: true},
-    pregnancy_status: {type : String, required: true},
-    chronic_condition: {type : String, required: true},
-    current_medications: {type : String, required: true},
-    allergies: {type : String, required: true},
+    smoking_status: {type : String, required: false},
+    pregnancy_status: {type : String, required: false},
+    chronic_condition: {type : String, required: false},
+    current_medications: {type : String, required: false},
+    allergies: {type : String, required: false},
     chief_complaint: {type : String, required: true},
 
     vitals: {        
-        temperature: {type : Number, required: true},
-        systolic_blood_pressure: {type : Number, required: true},
-        diastolic_blood_pressure: {type : Number, required: true},
-        pulse: {type : Number, required: true},
-        oxygen: {type : Number, required: true},
-        glucose: {type : Number, required: true},        
+        temperature: {type : Number, required: false},
+        systolic_blood_pressure: {type : Number, required: false},
+        diastolic_blood_pressure: {type : Number, required: false},
+        pulse: {type : Number, required: false},
+        oxygen: {type : Number, required: false},
+        glucose: {type : Number, required: false},        
     },
     
     soap: {
-        subjective: {type : String, required: true},
-        objective: {type : String, required: true},
-        assessment: {type : String, required: true},
+        subjective: {type : String, required: false},
+        objective: {type : String, required: false},
+        assessment: {type : String, required: false},
     },
 
-    provider_name: {type : String, required: true},
-    scribe_name: {type : String, required: true},
+    provider_name: {type : String, required: false},
+    scribe_name: {type : String, required: false},
     owner: {type : mongoose.Types.ObjectId, required: true, ref: 'Patient'}
 
 }, { timestamps: true });

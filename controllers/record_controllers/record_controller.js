@@ -58,7 +58,7 @@ const createRecord = async (req, res, next) => {
         sess.endSession();
     }
 
-    res.status(201).json( {place: createdRecord} );
+    res.status(201).json( {record: createdRecord} );
 
 };
 
