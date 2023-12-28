@@ -11,8 +11,12 @@ const patientSchema = new Schema({
     gender: {type: String, required: true},
     password: {type: String, required: true, minlength: 8},
     insurance: {type: String, required: true},
+    primary_care_provider: {type: String, required: true},
+    last_seen: {type: String, required: true},
     profile_picture: {type: String, required: true},
-    records: [ {type: mongoose.Types.ObjectId, required: true, ref: 'Record'} ]
+    records: [ {type: mongoose.Types.ObjectId, required: true, ref: 'Record'} ],
+    email_verify: {type: Boolean, required: true},
+    phone_verify: {type: Boolean, required: true}
 });
 
 patientSchema.plugin(uniqueValidator);
