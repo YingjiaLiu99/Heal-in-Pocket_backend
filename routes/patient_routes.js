@@ -13,5 +13,8 @@ router.post('/login', patientControllers.login);
 // get the patient by the patient's id
 router.get('/:patient_id', patientControllers.getPatientByPatientId);
 
+// volunteer create new patient 
+router.post('/volCreateNewPatientWithoutPhoneNum', patientControllers.volCreateNewPatientWithoutPhoneNum);
+
 
 module.exports = router;

@@ -1,13 +1,14 @@
 // const {validationResult} = require('express-validator');
 const HttpError = require('../../models/http_error');
 const Patient = require('../../models/patient');
+const { v4: uuidv4 } = require('uuid');
 
 
 const signup = async (req, res, next) => {
     /* potentially can check whether the input of the signup proccess 
      *  is valid using validationResult from express-validator */
 
-    const { name, email, phone_number, date_of_birth, gender, password, insurance, profile_picture } = req.body;
+    const { name, email, phone_number, date_of_birth, gender, password, insurance, pcps, caseHistory, profile_picture } = req.body;
 
     const createdPatient = new Patient({
         name,
@@ -17,6 +18,8 @@ const signup = async (req, res, next) => {
         gender,
         password,
         insurance,
+        pcps,
+        caseHistory,
         profile_picture,
         records: []
     });
@@ -105,7 +108,46 @@ const getPatientByPatientId = async (req, res, next) => {
     res.status(201).json( {patient: PatientObject} );    
 };
 
+//for volunteer to register a new patient 
+const volCreateNewPatientWithoutPhoneNum = async (req, res, next) => {
+    
+    const { name, date_of_birth, gender, insurance, primary_care_provider, last_seen } = req.body;
+
+    const createdPatient = new Patient({
+        name,
+        email: uuidv4(),
+        phone_number: -1,
+        date_of_birth,
+        gender,
+        password: "N/A_N/A_",
+        insurance,
+        primary_care_provider,
+        last_seen,
+        profile_picture: "N/A",
+        records: [],
+        email_verify: false,
+        phone_verify: false
+    });
+
+    try{
+        await createdPatient.save();
+    } catch (err) {
+        // catch other server error
+        console.log(err);
+        return next(new HttpError(
+            'Failed to sign up due to something wrong with server, please try again later', 500
+        ));
+    }
+
+    const PatientObject = createdPatient.toObject( {getters: true} );
+    // remove the sensitive info of Patient in the response
+    delete PatientObject.password;
+    res.status(201).json( {patient: PatientObject} );
+};
+
+
 
 exports.signup = signup;
 exports.login = login;
 exports.getPatientByPatientId = getPatientByPatientId;
+exports.volCreateNewPatientWithoutPhoneNum = volCreateNewPatientWithoutPhoneNum;
