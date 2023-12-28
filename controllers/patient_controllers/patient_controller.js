@@ -8,7 +8,8 @@ const signup = async (req, res, next) => {
     /* potentially can check whether the input of the signup proccess 
      *  is valid using validationResult from express-validator */
 
-    const { name, email, phone_number, date_of_birth, gender, password, insurance, pcps, caseHistory, profile_picture } = req.body;
+    const { name, email, phone_number, date_of_birth, gender, password,
+     insurance, primary_care_provider, last_seen, profile_picture } = req.body;
 
     const createdPatient = new Patient({
         name,
@@ -18,10 +19,12 @@ const signup = async (req, res, next) => {
         gender,
         password,
         insurance,
-        pcps,
-        caseHistory,
+        primary_care_provider,
+        last_seen,
         profile_picture,
-        records: []
+        records: [],
+        email_verify: true,
+        phone_verify: true
     });
 
     try{
@@ -115,11 +118,11 @@ const volCreateNewPatientWithoutPhoneNum = async (req, res, next) => {
 
     const createdPatient = new Patient({
         name,
-        email: uuidv4(),
+        email: "N/A: " + uuidv4(),
         phone_number: -1,
         date_of_birth,
         gender,
-        password: "N/A_N/A_",
+        password: "----N/A----",
         insurance,
         primary_care_provider,
         last_seen,
@@ -135,7 +138,7 @@ const volCreateNewPatientWithoutPhoneNum = async (req, res, next) => {
         // catch other server error
         console.log(err);
         return next(new HttpError(
-            'Failed to sign up due to something wrong with server, please try again later', 500
+            'Failed to create patient without phone number due to something wrong with server, please try again later', 500
         ));
     }
 

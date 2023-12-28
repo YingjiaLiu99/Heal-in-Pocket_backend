@@ -31,8 +31,12 @@ module.exports = mongoose.model('Patient', patientSchema);
 //     "date_of_birth":"11/06/1999",
 //     "gender":"male",
 //     "password":"1234567890",
-//     "insurance":"N.A.",
+//     "insurance":"N/A",
+//     "primary_care_provider": "N/A",
+//     "last_seen": "street corner care",
 //     "profile_picture":"N.A.",
-//     "records":[]
+//     "records":[],
+//     "email_verify": false,
+//     "phone_verify": false
 // }
 // ----------------------------------------------------------//
