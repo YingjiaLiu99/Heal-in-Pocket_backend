@@ -3,6 +3,7 @@ const Request = require('../../models/request');
 
 const addByPatient = async (req, res, next) => {};
 
+// ----------- volunteer creates a new request ----------------- //
 const addByVolunteer = async (req, res, next) => {
     const { patient_name, corresponding_record, new_patient, chief_complaint } = req.body;
 
@@ -26,6 +27,8 @@ const addByVolunteer = async (req, res, next) => {
     res.status(201).json({ request: newRequest.toObject({ getters: true }) });
 };
 
+
+// ----------- get all the requests in the queue -------------- //
 const getAllRequests = async (req, res, next) => {
     let requests;
     try{
@@ -42,6 +45,8 @@ const getAllRequests = async (req, res, next) => {
     )} );
 };
 
+
+// ----------- get single request given its id ------------------ //
 const getRequestById = async (req, res, next) => {
     const requestId = req.params.request_id;
     let request;
@@ -62,8 +67,10 @@ const getRequestById = async (req, res, next) => {
 
     const RequestObject = request.toObject( {getters: true} );
     res.status(201).json( {request: RequestObject} );
-}
+};
 
+
+// ----------- delete a request given its id ------------------ //
 const deleteRequestById = async (req, res, next) => {
     // Get the request id from route
     const requestId = req.params.request_id;
@@ -99,6 +106,8 @@ const deleteRequestById = async (req, res, next) => {
     res.json( {message: "Request delete success."} );
 };
 
+
+// ----------- update a request given its id ------------------ //
 const updateRequest = async (req, res, next) => {
     const requestId = req.params.request_id;
     const updatedData = req.body;

@@ -11,10 +11,12 @@ router.post('/signup', patientControllers.signup);
 router.post('/login', patientControllers.login);
 
 // get the patient by the patient's id
-router.get('/:patient_id', patientControllers.getPatientByPatientId);
+router.get('/patient/:patient_id', patientControllers.getPatientByPatientId);
 
 // volunteer create new patient 
 router.post('/volCreateNewPatientWithoutPhoneNum', patientControllers.volCreateNewPatientWithoutPhoneNum);
 
+// query patients by name(or partial name)
+router.get('/search/:name', patientControllers.queryPatientsByName);
 
 module.exports = router;

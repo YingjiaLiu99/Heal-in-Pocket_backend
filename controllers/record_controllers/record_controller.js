@@ -4,6 +4,7 @@ const HttpError = require('../../models/http_error');
 const Record = require('../../models/record');
 const Patient = require('../../models/patient');
 
+// -------------------------- create a new record -------------------------------- //
 const createRecord = async (req, res, next) => {
     const { record_type, smoking_status, pregnancy_status, chronic_condition, current_medications, allergies, chief_complaint, vitals, soap, provider_name, scribe_name, owner } = req.body;
 
@@ -59,9 +60,10 @@ const createRecord = async (req, res, next) => {
     }
 
     res.status(201).json( {record: createdRecord} );
-
 };
 
+
+// ------------------ get a single record given its id --------------------------- //
 const getRecordByRecordId = async (req, res, next) => {
     const recordId = req.params.record_id;
     let record;
@@ -83,6 +85,8 @@ const getRecordByRecordId = async (req, res, next) => {
     res.json({ record: record.toObject({getters: true}) });
 };
 
+
+// ------------ get all the records of one patient given the patient id ---------- //
 const getRecordsByPatientId = async (req, res, next) => {
     const patientId = req.params.patient_id;
     let records;
@@ -105,6 +109,8 @@ const getRecordsByPatientId = async (req, res, next) => {
     res.json({ records: records.map(record => record.toObject({getters: true})) });
 };
 
+
+// ------------------------ update a record given its id ------------------------- //
 const updateRecord = async (req, res, next) => {
     const record_id = req.params.record_id;
     const updatedData = req.body;

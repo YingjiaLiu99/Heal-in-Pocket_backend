@@ -1,7 +1,7 @@
 {
-  "name": "pocket_health_backend",
+  "name": "heal-in-pocket-backend",
   "version": "1.0.0",
-  "description": "backend server for PH",
+  "description": "backend server for HIP",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

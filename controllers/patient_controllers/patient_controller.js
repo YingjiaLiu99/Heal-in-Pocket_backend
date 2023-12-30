@@ -3,7 +3,7 @@ const HttpError = require('../../models/http_error');
 const Patient = require('../../models/patient');
 const { v4: uuidv4 } = require('uuid');
 
-
+// ------------------------ patient sign up ---------------------------------- //
 const signup = async (req, res, next) => {
     /* potentially can check whether the input of the signup proccess 
      *  is valid using validationResult from express-validator */
@@ -49,11 +49,11 @@ const signup = async (req, res, next) => {
     const PatientObject = createdPatient.toObject( {getters: true} );
     // remove the sensitive info of Patient in the response
     delete PatientObject.password;
-    res.status(201).json( {patient: PatientObject} );
+    res.status(201).json({ patient: PatientObject });
 };
 
 
-// login using email for now, can be improved later
+// ------------- login using email for now, can be improved later ------------ //
 const login = async (req, res, next) => {
     const { email, password } = req.body;
 
@@ -87,6 +87,8 @@ const login = async (req, res, next) => {
 
 };
 
+
+// ------------- get single patient object using its id ---------------------- //
 const getPatientByPatientId = async (req, res, next) => {
     const patientId = req.params.patient_id;
     let patient;
@@ -111,7 +113,8 @@ const getPatientByPatientId = async (req, res, next) => {
     res.status(201).json( {patient: PatientObject} );    
 };
 
-//for volunteer to register a new patient 
+
+// ------------- for volunteer to register a new patient --------------------- //
 const volCreateNewPatientWithoutPhoneNum = async (req, res, next) => {
     
     const { name, date_of_birth, gender, insurance, primary_care_provider, last_seen } = req.body;
@@ -149,8 +152,58 @@ const volCreateNewPatientWithoutPhoneNum = async (req, res, next) => {
 };
 
 
+// ---------------------- query patients by name  ---------------------------- //
+const queryPatientsByName = async (req, res, next) => {
+    const patientName = req.params.name;
+    let queryResult;
+    try {
+        // Construct the search query using MongoDB Atlas Search
+        const searchAggregation = [
+        // search stage
+        {
+            $search: {
+                index: 'searchPatients',
+                autocomplete: {
+                    query: patientName,
+                    path: 'name',           // the is the field to search in
+                    fuzzy: {                // use for handling minor typos
+                        maxEdits: 1,        // Maximum number of single-character edits required to match the specified search term
+                        prefixLength: 3     // Number of characters at the beginning of each term in the result that must exactly match.
+                    }
+                }
+            }
+                       
+        },
+        // Add a project stage to exclude the password field
+        {
+            $project: {
+                password: 0, // Exclude the password field
+                // Include any other fields you want to exclude or include
+            }
+        }
+        ];        
+        queryResult = await Patient.aggregate(searchAggregation); // Execute the query using Mongoose
+    } catch (err) {
+        console.log(err);
+        return next(new HttpError(
+            'Failed to query the patients due to something wrong with server, please try again later', 500
+        ));
+    }
+    // Map over the query result to convert '_id'(ObjectId) to 'id'(String)
+    const patients = queryResult.map(patient => {
+        // Create a new object for each patient
+        return {
+            ...patient,
+            id: patient._id.toString(), // Convert '_id' to a string and assign to 'id'           
+        };
+    });
+
+    res.json({ patients: patients });
+};
+
 
 exports.signup = signup;
 exports.login = login;
 exports.getPatientByPatientId = getPatientByPatientId;
 exports.volCreateNewPatientWithoutPhoneNum = volCreateNewPatientWithoutPhoneNum;
+exports.queryPatientsByName = queryPatientsByName;

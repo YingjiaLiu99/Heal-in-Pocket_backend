@@ -1,6 +1,6 @@
-# Pocket_Health_backend
+# Heal_in_Pocket_backend
 
-backend server for PH
+backend server for HIP
 Tech stack:
 Node.js
 Express
