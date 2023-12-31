@@ -14,6 +14,7 @@ const signup = async (req, res, next) => {
         phone_number,
         password,
         profile_picture,
+        viewed_records: [],
         online_status: 'online'
     });
 
