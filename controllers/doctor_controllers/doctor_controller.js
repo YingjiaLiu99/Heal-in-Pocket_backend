@@ -128,9 +128,36 @@ const addToViewedRecords = async (req, res, next) => {
     res.status(200).json({ doctor: doctor.toObject({ getters: true }) });
 };
 
+// ------------ get all the viewed_records of the doctor given the doctor id ---------- //
+const getViewedRecordsByDocId = async (req, res, next) => {
+    const doctorId = req.params.doctor_id;
+    // const doctorId = "6590a453e9775c5e7191519b"
+    let viewed_records;
+    
+    try {
+        doc = await Doctor.findById({ _id: doctorId } ).populate('viewed_records');
+        // console.log("the doctor find by id looks like: ", doc);
+        viewed_records = doc.viewed_records;
+    } catch (err) {
+        console.log(err);
+        return next(new HttpError(
+            'Failed to find the viewed records due to something wrong with server, please try again later', 500
+        ));        
+    }
+
+    if(!viewed_records || viewed_records.length === 0) {
+        return next(
+            new HttpError('Could not find any viewed records for the provided doctor id.', 404)
+        );
+    }
+
+    res.json({ viewed_records: viewed_records.map(viewed_record => viewed_record.toObject({getters: true})) });
+};
+
 
 
 exports.signup = signup;
 exports.login = login;
 exports.getDoctors = getDoctors;
 exports.addToViewedRecords = addToViewedRecords;
+exports.getViewedRecordsByDocId = getViewedRecordsByDocId;
