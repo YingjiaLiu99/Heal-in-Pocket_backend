@@ -166,10 +166,10 @@ const queryPatientsByName = async (req, res, next) => {
                 autocomplete: {
                     query: patientName,
                     path: 'name',           // the is the field to search in
-                    fuzzy: {                // use for handling minor typos
-                        maxEdits: 1,        // Maximum number of single-character edits required to match the specified search term
-                        prefixLength: 3     // Number of characters at the beginning of each term in the result that must exactly match.
-                    }
+                    // fuzzy: {                // use for handling minor typos
+                    //     maxEdits: 1,        // Maximum number of single-character edits required to match the specified search term
+                    //     prefixLength: 3     // Number of characters at the beginning of each term in the result that must exactly match.
+                    // }
                 }
             }
                        

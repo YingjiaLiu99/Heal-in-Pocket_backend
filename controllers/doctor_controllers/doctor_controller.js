@@ -93,22 +93,25 @@ const getDoctors = async (req, res, next) => {
     ) } );
 };
 
+// -------------------------- add one record to a doctor's viewed_records ------------------------ //
 const addToViewedRecords = async (req, res, next) => {
     
     const doctorId = req.params.doctor_id;
-    const { recordId } = req.body;
-    // const recordId = 123456789111
-
+    const recordId = req.body.record_id;
+    
     let doctor;
     try {
-        doctor = await Doctor.findById(doctorId);
-        if (!doctor) {
-            console.log(doctorId)
-            throw new Error('Doctor not found');
-        }
+        doctor = await Doctor.findById(doctorId);        
     } catch (err) {
         console.log(err);
         return next(new HttpError('Finding doctor failed, please try again', 500));
+    }
+
+    if (!doctor) {
+        console.log(doctorId)
+        return next(
+            new HttpError('Doctor dose not exists, please check doctor_id', 404)
+        );
     }
 
     if (!doctor.viewed_records.includes(recordId)) {

@@ -11,10 +11,10 @@ router.post('/signup', doctorControllers.signup);
 router.post('/login', doctorControllers.login);
 
 // get all the doctors
-router.get('/', doctorControllers.getDoctors);
+router.get('/all', doctorControllers.getDoctors);
 
-// add to viewed_records
-router.patch('/:doctor_id/addViewedRecords', doctorControllers.addToViewedRecords);
+// add a record to doctor's viewed_records
+router.patch('/addViewedRecords/:doctor_id', doctorControllers.addToViewedRecords);
 
 
 module.exports = router;
