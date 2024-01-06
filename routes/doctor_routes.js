@@ -17,7 +17,7 @@ router.get('/all', doctorControllers.getDoctors);
 router.patch('/addViewedRecords/:doctor_id', doctorControllers.addToViewedRecords);
 
 // get all the viewed_records by the doctor's id
-router.get('/:doctor_id', doctorControllers.getViewedRecordsByDocId);
+router.get('/viewedRecords/:doctor_id', doctorControllers.getViewedRecordsByDocId);
 
 
 module.exports = router;

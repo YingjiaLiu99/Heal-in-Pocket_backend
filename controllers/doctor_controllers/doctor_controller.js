@@ -131,12 +131,11 @@ const addToViewedRecords = async (req, res, next) => {
 // ------------ get all the viewed_records of the doctor given the doctor id ---------- //
 const getViewedRecordsByDocId = async (req, res, next) => {
     const doctorId = req.params.doctor_id;
-    // const doctorId = "6590a453e9775c5e7191519b"
+
     let viewed_records;
     
     try {
-        doc = await Doctor.findById({ _id: doctorId } ).populate('viewed_records');
-        // console.log("the doctor find by id looks like: ", doc);
+        doc = await Doctor.findById({ _id: doctorId } ).populate('viewed_records');        
         viewed_records = doc.viewed_records;
     } catch (err) {
         console.log(err);
