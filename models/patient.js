@@ -17,7 +17,7 @@ const patientSchema = new Schema({
     records: [ {type: mongoose.Types.ObjectId, required: true, ref: 'Record'} ],
     email_verify: {type: Boolean, required: true},
     phone_verify: {type: Boolean, required: true}
-});
+}, { timestamps: true });
 
 patientSchema.plugin(uniqueValidator);
 
