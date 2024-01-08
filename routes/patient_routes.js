@@ -19,4 +19,7 @@ router.post('/volCreateNewPatientWithoutPhoneNum', patientControllers.volCreateN
 // query patients by name(or partial name)
 router.get('/search/:name', patientControllers.queryPatientsByName);
 
+// update a patient's information
+router.patch('/update/:patient_id', patientControllers.updatePatientInformation);
+
 module.exports = router;

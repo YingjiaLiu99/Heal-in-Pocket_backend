@@ -114,6 +114,63 @@ const getPatientByPatientId = async (req, res, next) => {
 };
 
 
+const updatePatientInformation = async (req, res, next) => {
+    const patientId = req.params.patient_id;
+    const {insurance, primary_care_provider, last_seen} = req.body
+    let patient;
+
+    try {
+        patient = await Patient.findById(patientId);
+    } catch (err) {
+        console.log(err);
+        return next(new HttpError(
+            'Failed to get the patient using its id due to something wrong with server, please try again later', 500
+        ));        
+    }
+
+    if (!patient) {
+        return next(new HttpError(
+            'Could not find the patient that you tried to update', 404
+        ));
+    }
+
+    // Only change the fields that need to change
+    if ((insurance !== undefined) && (patient.insurance !== insurance)) {
+        patient.insurance = insurance;
+        if (insurance === "") {
+            patient.insurance = "N/A";
+        }
+    }
+    if ((primary_care_provider !== undefined) && (patient.primary_care_provider !== primary_care_provider)) {
+        patient.primary_care_provider = primary_care_provider;
+        if (primary_care_provider === "") {
+            patient.primary_care_provider = "N/A";
+        }
+    }
+    if ((last_seen !== undefined) && (patient.last_seen !== last_seen)) {
+        patient.last_seen = last_seen;
+        if (last_seen === "") {
+            patient.last_seen = "N/A";
+        }
+    }
+
+    try {
+        await patient.save();
+    } catch (err) {
+        console.log(err);
+        const error = new HttpError(
+            'Server Error: Failed to update the patient information', 500
+        );
+        return next(error);
+    }
+
+    const PatientObject = patient.toObject( {getters: true} );
+    // remove the sensitive info of Patient in the response
+    delete PatientObject.password;
+    res.status(201).json( {patient: PatientObject} );   
+};
+
+
 // ------------- for volunteer to register a new patient --------------------- //
 const volCreateNewPatientWithoutPhoneNum = async (req, res, next) => {
     
@@ -207,3 +264,4 @@ exports.login = login;
 exports.getPatientByPatientId = getPatientByPatientId;
 exports.volCreateNewPatientWithoutPhoneNum = volCreateNewPatientWithoutPhoneNum;
 exports.queryPatientsByName = queryPatientsByName;
+exports.updatePatientInformation = updatePatientInformation;
