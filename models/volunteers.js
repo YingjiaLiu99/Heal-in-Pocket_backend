@@ -3,6 +3,10 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 const Schema = mongoose.Schema;
 
+/**
+ * Name does not need to be unique
+ * Phone number needs to be unique
+ */
 const volunteerSchema = new Schema({
     name: {
         type: String, 
@@ -23,3 +27,4 @@ const volunteerSchema = new Schema({
 volunteerSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('Volunteer', volunteerSchema);
+
