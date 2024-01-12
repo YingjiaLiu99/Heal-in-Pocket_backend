@@ -1,35 +1,61 @@
 // const {validationResult} = require('express-validator');
 const HttpError = require('../../models/http_error');
 const Doctor = require('../../models/doctor');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 
-const signup = async (req, res, next) => {
+const signup_phone = async (req, res, next) => {
     /* potentially can check whether the input of the signup proccess 
      *  is valid using validationResult from express-validator */
 
-    const {name, email, phone_number, password, profile_picture} = req.body;
+    const { name, phone_number, password } = req.body;
+
+    let existingDoctor;
+    try {
+        existingDoctor = await Doctor.findOne({ phone_number: phone_number });
+    } catch (err) {
+        const error = new HttpError(
+            'Signing up failed, server error, please try again later', 500
+        );
+        return next(error);
+    }
+
+    if(existingDoctor) {
+        const error = new HttpError(
+            'A Doctor account with this phone number exists already, please login instead.', 400
+        );
+        
+        return next(error);
+    }
+
+    let hashedPassword;
+    try{
+        hashedPassword = await bcrypt.hash(password, 12);
+    } catch (err) {
+        const error = new HttpError('Could not create doctor account, please try a gain later.', 500);
+        return next(error);
+    }
+    
 
     const createdDoctor = new Doctor({
         name,
-        email,
+        email: "N/A: " + uuidv4(),
         phone_number,
-        password,
-        profile_picture,
+        password: hashedPassword,
+        profile_picture: "N/A",
         viewed_records: [],
-        online_status: 'online'
+        email_verify: false,
+        phone_verify: false, 
     });
 
     try{
         await createdDoctor.save();
     } catch (err) {
-        // check if the email already exists in the database
-        if(err.errors && err.errors.email && err.errors.email.kind === 'unique'){
-            return next(new HttpError('The email you entered already exists!', 400));
-        }
         // check if the phone number already exists in the database
         if(err.errors && err.errors.phone_number && err.errors.phone_number.kind === 'unique'){
             return next( new HttpError('The phone number you entered already exists!', 400) );
         }
-
         // catch other server error
         console.log(err);
         return next(new HttpError(
@@ -44,12 +70,12 @@ const signup = async (req, res, next) => {
 };
 
 // login using email for now, can be improved later
-const login = async (req, res, next) => {
-    const { email, password } = req.body;
+const login_phone = async (req, res, next) => {
+    const { phone_number, password } = req.body;
 
     let existingDoctor;
     try{
-        existingDoctor = await Doctor.findOne( {email: email} );
+        existingDoctor = await Doctor.findOne( {phone_number: phone_number} );
     } catch (err) {
         console.log(err);
         const error = new HttpError(
@@ -60,20 +86,44 @@ const login = async (req, res, next) => {
 
     if (!existingDoctor){
         const error = new HttpError(
-            'The doctor user you tried to log in does not exist, please try a different email address', 401
+            'The doctor user you tried to log in does not exist, please double check the phone number or you can try to sign up', 401
         );
         return next(error); 
     }
 
-    if (existingDoctor.password !== password){
+    let isValidPassword = false;
+    try {
+        isValidPassword = await bcrypt.compare(password, existingDoctor.password)
+    } catch (err) {
+        const error = new HttpError('Could not log you in, some error happens in our server', 500);
+        return next(error);
+    }
+
+    if(!isValidPassword){
         const error = new HttpError(
             'The password you entered does not match the email address, please try again', 401
         );
         return next(error);
     }
 
-    // If success (DUMMY login)
-    res.json( {message: 'Logged in'} );
+    // If success:
+    let token;
+    try {
+        token = jwt.sign(
+            { doctorId: existingDoctor.id },
+            'server-secret',
+            {expiresIn: '12h'}          
+        );
+    } catch (err) {
+        const error = new HttpError(
+            'Signing up failed, please try again later.', 500
+        );
+        return next(error);
+    }
+    res.json( {
+        message: 'Successfully logged in',
+        token: token
+    } );
 
 };
 
@@ -155,8 +205,8 @@ const getViewedRecordsByDocId = async (req, res, next) => {
 
 
 
-exports.signup = signup;
-exports.login = login;
+exports.signup_phone = signup_phone;
+exports.login_phone = login_phone;
 exports.getDoctors = getDoctors;
 exports.addToViewedRecords = addToViewedRecords;
 exports.getViewedRecordsByDocId = getViewedRecordsByDocId;

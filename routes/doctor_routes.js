@@ -5,10 +5,10 @@ const doctorControllers = require('../controllers/doctor_controllers/doctor_cont
 const router = express.Router();
 
 // doctor sign up
-router.post('/signup', doctorControllers.signup);
+router.post('/signup-phone', doctorControllers.signup_phone);
 
 // doctor log in
-router.post('/login', doctorControllers.login);
+router.post('/login-phone', doctorControllers.login_phone);
 
 // get all the doctors
 router.get('/all', doctorControllers.getDoctors);
