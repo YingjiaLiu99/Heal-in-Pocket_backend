@@ -1,16 +1,53 @@
 // const {validationResult} = require('express-validator');
 const HttpError = require('../../models/http_error');
 const Doctor = require('../../models/doctor');
+const InvitationCode = require('../../models/invitationCode');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 
+// ---------------------- sign up a doctor user using phone number and invitation code -------------- //
 const signup_phone = async (req, res, next) => {
     /* potentially can check whether the input of the signup proccess 
      *  is valid using validationResult from express-validator */
 
-    const { name, phone_number, password } = req.body;
+    const { name, phone_number, password, invitation_code } = req.body;
 
+    try {
+        // Query for non-expired invitation codes
+        const nonExpiredCodes = await InvitationCode.find({ 
+            expired: false,
+            expiredTime: { $gt: new Date() } // the expired time must be greater than current time
+        });        
+        // Compare the invitation code from the request with each non-expired code and delete it after use
+        let matchedCode = null;
+        for (let code of nonExpiredCodes) {
+            const result = await bcrypt.compare(invitation_code, code.code);
+            if (result) {
+                matchedCode = code;
+                break;
+            }
+        }
+
+        if (matchedCode) {
+            await InvitationCode.deleteOne({ _id: matchedCode._id }); // Success, delete the code and continue
+        }
+        
+        if(!matchedCode) {
+            const error = new HttpError(
+                'Invalid Invitation Code', 404
+            );
+            return next(error);
+        }
+
+    } catch (err) {
+        // other operation/server error
+        const error = new HttpError(
+            'Signing up failed, server error, please try again later', 500
+        );
+        return next(error);
+    }
+   
     let existingDoctor;
     try {
         existingDoctor = await Doctor.findOne({ phone_number: phone_number });
@@ -69,7 +106,7 @@ const signup_phone = async (req, res, next) => {
     res.status(201).json( {doctor: DoctorObject} );
 };
 
-// login using email for now, can be improved later
+// ---------------------- log in and assign the doctor a Token ---------------------------------------- //
 const login_phone = async (req, res, next) => {
     const { phone_number, password } = req.body;
 
@@ -127,6 +164,7 @@ const login_phone = async (req, res, next) => {
 
 };
 
+// ---------------------- get all the doctors --------------------------------------------------- //
 const getDoctors = async (req, res, next) => {
     let doctors;
     try{
