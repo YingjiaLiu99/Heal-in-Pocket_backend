@@ -5,10 +5,12 @@ const Schema = mongoose.Schema;
 
 const doctorSchema = new Schema({
     name: {type: String, required: true},
+    title: {type: String, required: true},
     email: {type: String, required: true, unique: true},
     phone_number: {type: Number, required: true, unique: true},
-    password: {type: String, required: true, minlength: 8},
+    password: {type: String, required: true},
     profile_picture: {type: String, required: true},
+    bio: {type: String, required: true},
     viewed_records: [ {type: mongoose.Types.ObjectId, required: true, ref: 'Record'} ],    
     email_verify: {type: Boolean, required: true},
     phone_verify: {type: Boolean, required: true} 

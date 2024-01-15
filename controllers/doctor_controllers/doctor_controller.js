@@ -11,7 +11,7 @@ const signup_phone = async (req, res, next) => {
     /* potentially can check whether the input of the signup proccess 
      *  is valid using validationResult from express-validator */
 
-    const { name, phone_number, password, invitation_code } = req.body;
+    const { name, title, phone_number, password, invitation_code } = req.body;
 
     try {
         // Query for non-expired invitation codes
@@ -42,6 +42,7 @@ const signup_phone = async (req, res, next) => {
 
     } catch (err) {
         // other operation/server error
+        console.log('operation error: InvitationCode.find or bcrypt.compare or InvitationCode.deleteOne');
         const error = new HttpError(
             'Signing up failed, server error, please try again later', 500
         );
@@ -52,6 +53,7 @@ const signup_phone = async (req, res, next) => {
     try {
         existingDoctor = await Doctor.findOne({ phone_number: phone_number });
     } catch (err) {
+        console.log('operation error: Doctor.findOne');
         const error = new HttpError(
             'Signing up failed, server error, please try again later', 500
         );
@@ -70,6 +72,7 @@ const signup_phone = async (req, res, next) => {
     try{
         hashedPassword = await bcrypt.hash(password, 12);
     } catch (err) {
+        console.log('operation error: bcrypt.hash');
         const error = new HttpError('Could not create doctor account, please try a gain later.', 500);
         return next(error);
     }
@@ -77,10 +80,12 @@ const signup_phone = async (req, res, next) => {
 
     const createdDoctor = new Doctor({
         name,
+        title,
         email: "N/A: " + uuidv4(),
         phone_number,
         password: hashedPassword,
         profile_picture: "N/A",
+        bio: "N/A",
         viewed_records: [],
         email_verify: false,
         phone_verify: false, 
@@ -103,7 +108,27 @@ const signup_phone = async (req, res, next) => {
     const DoctorObject = createdDoctor.toObject( {getters: true} );
     // remove the sensitive info of Doctor in the response
     delete DoctorObject.password;
-    res.status(201).json( {doctor: DoctorObject} );
+
+    let token;
+    try {
+        token = jwt.sign(
+            { doctorId: DoctorObject.id },
+            'server-secret',
+            {expiresIn: '12h'}          
+        );
+    } catch (err) {
+        console.log('operation error: jwt.sign');
+        const error = new HttpError(
+            'Signing up failed, please try again later.', 500
+        );
+        return next(error);
+    }
+
+    res.status(201).json( {
+        message: 'Successfully Signed Up',
+        token: token,
+        doctor: DoctorObject
+    } );
 };
 
 // ---------------------- log in and assign the doctor a Token ---------------------------------------- //
@@ -138,7 +163,7 @@ const login_phone = async (req, res, next) => {
 
     if(!isValidPassword){
         const error = new HttpError(
-            'The password you entered does not match the email address, please try again', 401
+            'The password you entered does not match the phone number, please try again', 401
         );
         return next(error);
     }
@@ -153,13 +178,17 @@ const login_phone = async (req, res, next) => {
         );
     } catch (err) {
         const error = new HttpError(
-            'Signing up failed, please try again later.', 500
+            'Login failed, please try again later.', 500
         );
         return next(error);
     }
+
+    const DoctorObject = existingDoctor.toObject( {getters: true} );
+    delete DoctorObject.password;
     res.json( {
         message: 'Successfully logged in',
-        token: token
+        token: token,
+        doctor: DoctorObject
     } );
 
 };
