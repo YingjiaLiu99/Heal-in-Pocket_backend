@@ -86,7 +86,7 @@ const deleteRequestById = async (req, res, next) => {
         return next(error); 
     }
 
-    // Check if the request was actually found
+    // Check if the request is actually found
     if (!request) {
         return next(new HttpError(
             'Could not find the request corresponding to the provided request id', 404

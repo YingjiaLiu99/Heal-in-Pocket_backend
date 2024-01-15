@@ -113,7 +113,7 @@ const getPatientByPatientId = async (req, res, next) => {
     res.status(201).json( {patient: PatientObject} );    
 };
 
-
+// ------------- update a patient's information ----------------------------- //
 const updatePatientInformation = async (req, res, next) => {
     const patientId = req.params.patient_id;
     const {insurance, primary_care_provider, last_seen} = req.body
