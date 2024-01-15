@@ -9,7 +9,9 @@ const doctorRoutes = require('./routes/doctor_routes');
 const patientRoutes = require('./routes/patient_routes');
 const recordRoutes = require('./routes/record_routes');
 const requestRoutes = require('./routes/request_routes');
+const volunteerRoutes = require('./routes/volunteer_routes');
 const invitationCodeRoutes = require('./routes/invitationCode_routes');
+
 const HttpError = require('./models/http_error');
 
 const app = express();
@@ -23,7 +25,9 @@ app.use('/api/v1.0/doctor', doctorRoutes);
 app.use('/api/v1.0/patient', patientRoutes);
 app.use('/api/v1.0/record', recordRoutes);
 app.use('/api/v1.0/request', requestRoutes);
+app.use('/api/v1.0/volunteer', volunteerRoutes);
 app.use('/api/v1.0/invitationCode', invitationCodeRoutes);
+
 
 // this is not a 'error handling middleware', but its used to catch routes-not-found error
 app.use((req, res, next) => {
