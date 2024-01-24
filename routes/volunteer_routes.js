@@ -7,7 +7,7 @@ router.post('/signup_phone', volunteerControllers.signup_phone);
 
 
 // volunteer log in
-router.post('/login', volunteerControllers.login);
+router.post('/login_phone', volunteerControllers.login_phone);
 
 
 module.exports = router;

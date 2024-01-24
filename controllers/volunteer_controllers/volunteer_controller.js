@@ -131,55 +131,70 @@ const signup_phone = async (req, res, next) => {
 };
 
 // password compare has issue: 
-const login = async (req, res, next) => {
+const login_phone = async (req, res, next) => {
 
-    Volunteer.findOne({ phone_number: req.body.phone_number })
-        .then(volunteer => {
-            if (!volunteer){
-                const error = new HttpError(
-                    'The volunteer user you tried to log in does not exist, please try a different phone number', 401
-                );
-                return next(error); 
-            }
-            bcrypt
-                .compare(req.body.password, volunteer.password)
-                .then((passwordCheck) => {
 
-                    // check if password matches
-                    if(!passwordCheck) {
-                      return next(new HttpError('The password you entered does not match the phone number, please try again', 400));
-                    }
+    const {phone_number, password} = req.body;
 
-                    //   create JWT token
-                    const token = jwt.sign(
-                        {
-                            volunteerId: volunteer._id,
-                            volunteerPhoneNumber: volunteer.phone_number,
-                        },
-                        "RANDOM-TOKEN",
-                        { expiresIn: "24h" }
-                    );
+    let existedVolunteer;
+    try {
+        existedVolunteer = await Volunteer.findOne({ phone_number: phone_number });
+    } catch (err) {
+        console.log('operation error: Volunteer.findOne');
+        const error = new HttpError(
+            'Signing up failed, server error, please try again later', 500
+        );
+        return next(error);
+    }
 
-                    //   return success response
-                    res.status(200).send({
-                        message: "Login Successful",
-                        phone_number: volunteer.phone_number,
-                        token,
-                    });
-                })
-                .catch(err => {
-                    console.log(err);
-                    return next(new HttpError('The password you entered does not match the phone number, please try again', 400));
-                });
-        })
-        .catch(err => {
-            console.log(err);
-            return next(new HttpError(
-                'Failed to login due to something wrong with server, please try again later', 500
-            ));
-        });
+    if (!existedVolunteer) {
+        return next( new HttpError('The volunteer user you trying to login does not exist! Please double check the phone number', 404) );
+    }
+
+    let passwordCheck = false;
+    try{
+        passwordCheck = await bcrypt.compare(password, existedVolunteer.password);
+    } catch (err) {
+        console.log('operation error: bcrypt.compare');
+        return next(new HttpError(
+            'Could not log you in, some error happens in our server',
+            500
+        ));
+    }
+
+    if (!passwordCheck) {
+        return next(new HttpError(
+            'The password you entered does not match the phone number, please try again',
+            401
+        ));
+    }
+
+    // If login success, create JWT token
+    let token;
+    try {
+        token = jwt.sign(
+            {volunteerId: existedVolunteer.id, volunteerPhoneNumber: existedVolunteer.phone_number}, 
+            "RANDOM-TOKEN",
+            { expiresIn: "12h" }
+        );
+    }
+    catch (err) {
+        console.log('operation error: jwt.sign');
+        const error = new HttpError(
+            'Login failed, please try again later.', 500
+        );
+        return next(error);
+    }
+
+    const volunteerObject = existedVolunteer.toObject({ getters: true });
+    delete volunteerObject.password;
+    res.json({
+        message: "Login Successful",
+        volunteer: volunteerObject,
+        token: token,
+    });
 
 };
 
 exports.signup_phone = signup_phone;
-exports.login = login;
+exports.login_phone = login_phone;
