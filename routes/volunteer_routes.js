@@ -3,11 +3,11 @@ const volunteerControllers = require('../controllers/volunteer_controllers/volun
 const router = express.Router();
 
 // volunteer sign up
-router.post('/signup', volunteerControllers.signup);
+router.post('/signup_phone', volunteerControllers.signup_phone);
 
 
 // volunteer log in
-router.post('/login', volunteerControllers.login);
+router.post('/login_phone', volunteerControllers.login_phone);
 
 
 module.exports = router;

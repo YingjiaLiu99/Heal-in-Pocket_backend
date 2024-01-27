@@ -148,7 +148,7 @@ const login_phone = async (req, res, next) => {
 
     if (!existingDoctor){
         const error = new HttpError(
-            'The doctor user you tried to log in does not exist, please double check the phone number or you can try to sign up', 401
+            'The doctor user you tried to log in does not exist, please double check the phone number or you can try to sign up', 404
         );
         return next(error); 
     }
