@@ -13,6 +13,7 @@ const signup_phone = async (req, res, next) => {
 
     const { name, title, phone_number, password, invitation_code } = req.body;
 
+    let matchedCode = null;
     try {
         // Query for non-expired invitation codes
         const nonExpiredCodes = await InvitationCode.find({ 
@@ -20,17 +21,13 @@ const signup_phone = async (req, res, next) => {
             expiredTime: { $gt: new Date() } // the expired time must be greater than current time
         });        
         // Compare the invitation code from the request with each non-expired code and delete it after use
-        let matchedCode = null;
+        
         for (let code of nonExpiredCodes) {
             const result = await bcrypt.compare(invitation_code, code.code);
             if (result) {
                 matchedCode = code;
                 break;
             }
-        }
-
-        if (matchedCode) {
-            await InvitationCode.deleteOne({ _id: matchedCode._id }); // Success, delete the code and continue
         }
         
         if(!matchedCode) {
@@ -63,8 +60,7 @@ const signup_phone = async (req, res, next) => {
     if(existingDoctor) {
         const error = new HttpError(
             'A Doctor account with this phone number exists already, please login instead.', 400
-        );
-        
+        );        
         return next(error);
     }
 
@@ -75,8 +71,7 @@ const signup_phone = async (req, res, next) => {
         console.log('operation error: bcrypt.hash');
         const error = new HttpError('Could not create doctor account, please try a gain later.', 500);
         return next(error);
-    }
-    
+    }    
 
     const createdDoctor = new Doctor({
         name,
@@ -104,10 +99,21 @@ const signup_phone = async (req, res, next) => {
             'Failed to sign up due to something wrong with server, please try again later', 500
         ));
     }
+    
+    if (matchedCode) {
+        try{
+            await InvitationCode.deleteOne({ _id: matchedCode._id }); // Success, delete the code and continue
+        } catch (err) {
+            console.log('operation error: InvitationCode.deleteOne');
+            const error = new HttpError(
+                'Signing up failed, server error, please try again later', 500
+            );
+            return next(error);
+        }
+    }
 
-    const DoctorObject = createdDoctor.toObject( {getters: true} );
-    // remove the sensitive info of Doctor in the response
-    delete DoctorObject.password;
+    const DoctorObject = createdDoctor.toObject( {getters: true} );    
+    delete DoctorObject.password; // remove the sensitive info of Doctor in the response
 
     let token;
     try {
@@ -177,6 +183,7 @@ const login_phone = async (req, res, next) => {
             {expiresIn: '12h'}          
         );
     } catch (err) {
+        console.log('operation error: jwt.sign');
         const error = new HttpError(
             'Login failed, please try again later.', 500
         );

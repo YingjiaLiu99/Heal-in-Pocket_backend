@@ -110,7 +110,7 @@ const signup_phone = async (req, res, next) => {
                 volunteerId: volunteerObject.id,
                 volunteerPhoneNumber: volunteerObject.phone_number,
             },
-            "RANDOM-TOKEN",
+            "server-secret",
             { expiresIn: "12h" }
         );
     } catch (err) {
@@ -132,8 +132,6 @@ const signup_phone = async (req, res, next) => {
 
 // password compare has issue: 
 const login_phone = async (req, res, next) => {
-
-
     const {phone_number, password} = req.body;
 
     let existedVolunteer;
@@ -174,7 +172,7 @@ const login_phone = async (req, res, next) => {
     try {
         token = jwt.sign(
             {volunteerId: existedVolunteer.id, volunteerPhoneNumber: existedVolunteer.phone_number}, 
-            "RANDOM-TOKEN",
+            "server-secre",
             { expiresIn: "12h" }
         );
     }
