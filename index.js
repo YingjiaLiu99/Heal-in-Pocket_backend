@@ -53,6 +53,7 @@ app.use((error, req, res, next) => {
 mongoose.connect(process.env.DB_URL)
 .then(() => {
     app.listen(5001);
+    console.log(`Successfully connected to MongoDB, server is running...`);
 })
 .catch(err => {
     console.log(err);
